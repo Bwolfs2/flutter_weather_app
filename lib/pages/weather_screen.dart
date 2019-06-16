@@ -37,7 +37,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
         child: Container(
           child: StreamBuilder<Color>(
               stream: blocTheme.appBarColor,
-              builder: (context, snapshot) {
+              builder: (context, AsyncSnapshot snapshot) {
                 return AppBar(
                   backgroundColor: snapshot.data,
                   title: Center(
@@ -96,91 +96,180 @@ class _WeatherScreenState extends State<WeatherScreen> {
         ),
         preferredSize: Size.fromHeight(60),
       ),
-      body: StreamBuilder<Weather>(
-          stream: bloc.weatherStream,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(child: CircularProgressIndicator());
-            }
-
-            blocTheme.setWeather(snapshot.data);
-
-            return StreamBuilder<List<Color>>(
+      body: Stack(
+        children: <Widget>[
+          StreamBuilder<Weather>(
+            stream: bloc.weatherFlux,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Center(child: CircularProgressIndicator());
+              }
+              var stateWeather = snapshot.data;
+              blocTheme.setWeather(snapshot.data);
+              return StreamBuilder<List<Color>>(
                 stream: blocTheme.gradientColorStream,
                 initialData: <Color>[Colors.white, Colors.white, Colors.white],
                 builder: (context, snapshotTheme) {
                   return Container(
                     decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: snapshotTheme.data)),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: snapshotTheme.data,
+                      ),
+                    ),
                     child: Center(
                       child: Container(
-                          height: 350,
-                          padding: EdgeInsets.symmetric(horizontal: 70),
-                          child: Column(
-                            children: <Widget>[
-                              Text(
-                                "${snapshot.data.location}",
-                                style: TextStyle(
-                                    fontSize: 35,
+                        height: 350,
+                        padding: EdgeInsets.symmetric(horizontal: 70),
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                              "${stateWeather.location}",
+                              style: TextStyle(
+                                fontSize: 35,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontFamily: "comic_sandchez",
+                              ),
+                            ),
+                            Text(
+                              "Updated: 11:16 PM",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                ImageConditionHelper.mapConditionToImage(
+                                    stateWeather.condition),
+                                Text(
+                                  "${stateWeather.temp.toString().split(".")[0]}°",
+                                  style: TextStyle(
+                                    fontSize: 30,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
-                                    fontFamily: "comic_sandchez"),
-                              ),
-                              Text("Updated: 11:16 PM",
-                                  style: TextStyle(
-                                      fontSize: 18, color: Colors.white)),
-                              SizedBox(
-                                height: 30,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  ImageConditionHelper.mapConditionToImage(
-                                      snapshot.data.condition),
-                                  Text(
-                                    "${snapshot.data.temp.toString().split(".")[0]}°",
-                                    style: TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white),
                                   ),
-                                  Column(
-                                    children: <Widget>[
-                                      Text(
-                                        "max: ${snapshot.data.maxTemp.toString().split(".")[0]}°",
-                                        style: TextStyle(
-                                            fontSize: 17, color: Colors.white),
+                                ),
+                                Column(
+                                  children: <Widget>[
+                                    Text(
+                                      "max: ${stateWeather.maxTemp.toString().split(".")[0]}°",
+                                      style: TextStyle(
+                                          fontSize: 17, color: Colors.white),
+                                    ),
+                                    Text(
+                                      "min: ${stateWeather.minTemp.toString().split(".")[0]}°",
+                                      style: TextStyle(
+                                        fontSize: 17,
+                                        color: Colors.white,
                                       ),
-                                      Text(
-                                        "min: ${snapshot.data.minTemp.toString().split(".")[0]}°",
-                                        style: TextStyle(
-                                            fontSize: 17, color: Colors.white),
-                                      ),
-                                    ],
-                                  )
-                                ],
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            Text(
+                              "${stateWeather.formattedCondition}",
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.white,
+                                fontFamily: "comic_sandchez",
                               ),
-                              SizedBox(
-                                height: 30,
-                              ),
-                              Text(
-                                "${snapshot.data.formattedCondition}",
-                                style: TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w300,
-                                    color: Colors.white,
-                                    fontFamily: "comic_sandchez"),
-                              ),
-                            ],
-                          )),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   );
-                });
-          }),
+                },
+              );
+            },
+          ),
+          StreamBuilder<BlocState<Weather>>(
+            stream: bloc.weatherStateFlux,
+            builder: (_, snap) {
+              if (snap.data == null || snap.data.isLoaded()) {
+                return Container();
+              }
+
+              return Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xff99000000),
+                  ),
+                  child: Center(
+                    child: Container(
+                      height: 200,
+                      width: 200,
+                      padding: EdgeInsets.all(30),
+                      color: Colors.white,
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            width: 80,
+                            height: 80,
+                            child: snap.data.isSuccess()
+                                ? Icon(
+                                    Icons.done,
+                                    color: Colors.greenAccent,
+                                    size: 80,
+                                  )
+                                : snap.data.hasError()
+                                    ? Icon(
+                                        Icons.close,
+                                        color: Colors.redAccent,
+                                        size: 80,
+                                      )
+                                    : CircularProgressIndicator(
+                                        strokeWidth: 8,
+                                      ),
+                          ),
+                          SizedBox(
+                            height: 30,
+                          ),
+                          snap.data.isSuccess()
+                              ? Text(
+                                  "Success",
+                                  style: TextStyle(
+                                    color: Colors.greenAccent,
+                                    fontSize: 25,
+                                  ),
+                                )
+                              : snap.data.hasError()
+                                  ? Text(
+                                      "Error",
+                                      style: TextStyle(
+                                        color: Colors.redAccent,
+                                        fontSize: 25,
+                                      ),
+                                    )
+                                  : Text(
+                                      "Loading",
+                                      style: TextStyle(
+                                        color: Colors.blue,
+                                        fontSize: 25,
+                                      ),
+                                    ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          )
+        ],
+      ),
     );
   }
 }
