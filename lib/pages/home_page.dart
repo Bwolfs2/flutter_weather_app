@@ -4,96 +4,23 @@ import 'package:flutter_weather_app/blocs/theme_bloc.dart';
 import 'package:flutter_weather_app/blocs/weather_bloc.dart';
 import 'package:flutter_weather_app/models/image_condition_helper.dart';
 import 'package:flutter_weather_app/models/weather.dart';
+import 'home_app_bar.dart';
+import 'load_page.dart';
 
-class WeatherScreen extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  _WeatherScreenState createState() => _WeatherScreenState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _WeatherScreenState extends State<WeatherScreen> {
+class _HomePageState extends State<HomePage> {
   var bloc = BlocProvider.getBloc<WeatherBloc>();
   var blocTheme = BlocProvider.getBloc<ThemeBloc>();
-
-  final List<PopupMenuItem<int>> dropList = new List<PopupMenuItem<int>>();
-
-  PopupMenuItem<int> popupMenuItem(String text, int value) {
-    return PopupMenuItem<int>(
-      child: Row(
-        children: <Widget>[
-          Container(
-            child: Text("$text"),
-            width: 200,
-          )
-        ],
-      ),
-      value: value,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        child: Container(
-          child: StreamBuilder<Color>(
-              stream: blocTheme.appBarColor,
-              builder: (context, AsyncSnapshot snapshot) {
-                return AppBar(
-                  backgroundColor: snapshot.data,
-                  title: Center(
-                    child: Text("Flutter Weather"),
-                  ),
-                  actions: <Widget>[
-                    PopupMenuButton<int>(
-                      offset: Offset(100, 100),
-                      icon: Icon(Icons.settings),
-                      itemBuilder: (BuildContext context) {
-                        return <PopupMenuItem<int>>[
-                          popupMenuItem("Rio de Janeiro", 0),
-                          popupMenuItem("São Paulo", 1),
-                          popupMenuItem("Brasília", 2),
-                          popupMenuItem("Salvador", 3),
-                          popupMenuItem("Calgary", 4),
-                        ];
-                      },
-                      onSelected: (val) {
-                        switch (val) {
-                          case 0:
-                            {
-                              bloc.changeCity.add("Rio de Janeiro");
-                              break;
-                            }
-                          case 1:
-                            {
-                              bloc.changeCity.add("São Paulo");
-                              break;
-                            }
-                          case 2:
-                            {
-                              bloc.changeCity.add("Brasília");
-                              break;
-                            }
-                          case 3:
-                            {
-                              bloc.changeCity.add("Salvador");
-                              break;
-                            }
-                          case 4:
-                            {
-                              bloc.changeCity.add("Calgary");
-                              break;
-                            }
-                        }
-                      },
-                    ),
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.search),
-                    )
-                  ],
-                );
-              }),
-        ),
+        child: HomeAppBar(),
         preferredSize: Size.fromHeight(60),
       ),
       body: Stack(
@@ -105,7 +32,6 @@ class _WeatherScreenState extends State<WeatherScreen> {
                 return Center(child: CircularProgressIndicator());
               }
               var stateWeather = snapshot.data;
-              blocTheme.setWeather(snapshot.data);
               return StreamBuilder<List<Color>>(
                 stream: blocTheme.gradientColorStream,
                 initialData: <Color>[Colors.white, Colors.white, Colors.white],
@@ -195,79 +121,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
               );
             },
           ),
-          StreamBuilder<BlocState<Weather>>(
-            stream: bloc.weatherStateFlux,
-            builder: (_, snap) {
-              if (snap.data == null || snap.data.isLoaded()) {
-                return Container();
-              }
-
-              return Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xff99000000),
-                  ),
-                  child: Center(
-                    child: Container(
-                      height: 200,
-                      width: 200,
-                      padding: EdgeInsets.all(30),
-                      color: Colors.white,
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            width: 80,
-                            height: 80,
-                            child: snap.data.isSuccess()
-                                ? Icon(
-                                    Icons.done,
-                                    color: Colors.greenAccent,
-                                    size: 80,
-                                  )
-                                : snap.data.hasError()
-                                    ? Icon(
-                                        Icons.close,
-                                        color: Colors.redAccent,
-                                        size: 80,
-                                      )
-                                    : CircularProgressIndicator(
-                                        strokeWidth: 8,
-                                      ),
-                          ),
-                          SizedBox(
-                            height: 30,
-                          ),
-                          snap.data.isSuccess()
-                              ? Text(
-                                  "Success",
-                                  style: TextStyle(
-                                    color: Colors.greenAccent,
-                                    fontSize: 25,
-                                  ),
-                                )
-                              : snap.data.hasError()
-                                  ? Text(
-                                      "Error",
-                                      style: TextStyle(
-                                        color: Colors.redAccent,
-                                        fontSize: 25,
-                                      ),
-                                    )
-                                  : Text(
-                                      "Loading",
-                                      style: TextStyle(
-                                        color: Colors.blue,
-                                        fontSize: 25,
-                                      ),
-                                    ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          )
+         LoadPage()
         ],
       ),
     );

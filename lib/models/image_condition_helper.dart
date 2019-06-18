@@ -33,5 +33,4 @@ class ImageConditionHelper {
     }
     return image;
   }
-
 }
