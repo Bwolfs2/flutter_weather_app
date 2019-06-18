@@ -4,22 +4,28 @@ import 'package:flutter_weather_app/models/weather.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ThemeBloc extends BlocBase {
-  var _gradientController = BehaviorSubject<List<Color>>.seeded(<Color>[Colors.red, Colors.white, Colors.white]);
+  ThemeBloc() {
+    _weatherController.listen((weather) {
+      fillTheme(weather.condition);
+    });
+  }
+
+  var _gradientController = BehaviorSubject<List<Color>>.seeded(
+      <Color>[Colors.red, Colors.white, Colors.white]);
   var _appBarColorController = BehaviorSubject<Color>.seeded(Colors.blueAccent);
 
   Observable<List<Color>> get gradientColorStream => _gradientController.stream;
 
   Observable<Color> get appBarColor => _appBarColorController.stream;
 
-  setWeather(Weather weather) {
-    fillTheme(weather.condition);
-  }
+  var _weatherController = BehaviorSubject<Weather>();
+  Sink<Weather> get weatherSink => _weatherController.sink;
 
   fillTheme(WeatherCondition condition) {
     switch (condition) {
       case WeatherCondition.clear:
       case WeatherCondition.lightCloud:
-      _appBarColorController.add(Color(0xffFBC02D));
+        _appBarColorController.add(Color(0xffFBC02D));
         _gradientController.add(<Color>[
           Color(0xffE2AD29),
           Color(0xffFBC02D),
@@ -29,7 +35,7 @@ class ThemeBloc extends BlocBase {
       case WeatherCondition.snow:
       case WeatherCondition.sleet:
       case WeatherCondition.hail:
-      _appBarColorController.add(Color(0xff0388D1));
+        _appBarColorController.add(Color(0xff0388D1));
         _gradientController.add(<Color>[
           Color(0xff0872A8),
           Color(0xff0388D1),
@@ -48,7 +54,7 @@ class ThemeBloc extends BlocBase {
       case WeatherCondition.showers:
       case WeatherCondition.heavyRain:
       case WeatherCondition.lightRain:
-      _appBarColorController.add(Color(0xff303F9F));
+        _appBarColorController.add(Color(0xff303F9F));
         _gradientController.add(<Color>[
           Color(0xff2A378D),
           Color(0xff303F9F),

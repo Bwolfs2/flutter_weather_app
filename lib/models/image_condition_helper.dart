@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'weather.dart';
 
 class ImageConditionHelper {

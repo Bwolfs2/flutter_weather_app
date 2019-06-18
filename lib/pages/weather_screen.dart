@@ -105,7 +105,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                 return Center(child: CircularProgressIndicator());
               }
               var stateWeather = snapshot.data;
-              blocTheme.setWeather(snapshot.data);
+              blocTheme.weatherSink.add(snapshot.data);
               return StreamBuilder<List<Color>>(
                 stream: blocTheme.gradientColorStream,
                 initialData: <Color>[Colors.white, Colors.white, Colors.white],
