@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'dart:convert';
 
 import 'package:flutter_weather_app/models/weather.dart';
 
@@ -7,7 +6,7 @@ class WeatherApiClient {
   static const baseUrl = 'https://www.metaweather.com';
   final Dio dio;
 
-  WeatherApiClient({this.dio}) : assert(dio != null);
+  WeatherApiClient(this.dio);
 
   Future<int> getLocationId(String city) async {
     final locationUrl = '$baseUrl/api/location/search/?query=$city';

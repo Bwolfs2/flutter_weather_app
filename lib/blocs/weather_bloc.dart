@@ -1,24 +1,20 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter_weather_app/infraestructure/weather_api_client.dart';
 import 'package:flutter_weather_app/models/weather.dart';
 import 'package:flutter_weather_app/repositories/weather_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
 class WeatherBloc extends BlocBase {
-  var _api = WeatherRepository(weatherApiClient: WeatherApiClient(dio: Dio()));
+  WeatherRepository _api;
+  WeatherBloc(this._api);
 
-  final _weatherController = new BehaviorSubject<String>();
+  final _weatherController = new BehaviorSubject<String>.seeded("Rio de Janeiro");
+  Sink<String> get weatherSink =>_weatherController.sink;
 
-  Observable<Weather> get weatherFlux =>
-      weatherStateFlux.where((mp) => mp.isSuccess()).map((mp) => mp.obj);
+  Observable<Weather> get weatherFlux => weatherStateFlux.where((mp) => mp.isSuccess()).map((mp) => mp.obj);
 
   Observable<BlocState<Weather>> get weatherStateFlux =>
       _weatherController.stream.concatMap((item) => _getApi(item));
 
-  void atualizar(String string) {
-    _weatherController.add(string);
-  }
 
   Stream<BlocState<Weather>> _getApi(String string) async* {
     yield BlocState.loading();
@@ -36,10 +32,10 @@ class WeatherBloc extends BlocBase {
     }
   }
 
-  WeatherBloc() {
-    //São Paulo
-    atualizar("Rio de Janeiro");
-    //_api.getWeather("Rio de Janeiro").then((data) async =>_controller.add(data));
+  @override
+  void dispose() {
+ _weatherController.close();
+    super.dispose();
   }
 }
 

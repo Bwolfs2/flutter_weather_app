@@ -60,27 +60,27 @@ class _WeatherScreenState extends State<WeatherScreen> {
                         switch (val) {
                           case 0:
                             {
-                              bloc.atualizar("Rio de Janeiro");
+                              bloc.weatherSink.add("Rio de Janeiro");
                               break;
                             }
                           case 1:
                             {
-                              bloc.atualizar("São Paulo");
+                              bloc.weatherSink.add("São Paulo");
                               break;
                             }
                           case 2:
                             {
-                              bloc.atualizar("Brasília");
+                              bloc.weatherSink.add("Brasília");
                               break;
                             }
                           case 3:
                             {
-                              bloc.atualizar("Salvador");
+                              bloc.weatherSink.add("Salvador");
                               break;
                             }
                           case 4:
                             {
-                              bloc.atualizar("Calgary");
+                              bloc.weatherSink.add("Calgary");
                               break;
                             }
                         }
