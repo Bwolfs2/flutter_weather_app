@@ -8,17 +8,21 @@ import 'BlocStates.dart';
 class WeatherInterceptor extends BlocBase
 {
   WeatherRepository _api;
-  WeatherInterceptor(this._api);
+  WeatherInterceptor(this._api){
+    weatherStateFlux = _weatherController.stream.switchMap(_getApi);
+    weatherFlux = weatherStateFlux.where((mp) => mp.isSuccess()).map((mp) => mp.obj);  
+  }
 
-  final _weatherController = new BehaviorSubject<String>.seeded("Rio de Janeiro");
+  final _weatherController = new BehaviorSubject<String>.seeded("Rio de Janeiro",sync:true);
 
-  Observable<Weather> get weatherFlux => weatherStateFlux.where((mp) => mp.isSuccess()).map((mp) => mp.obj);
+  Observable<Weather>  weatherFlux;
 
-  Observable<BlocStates<Weather>> get weatherStateFlux => _weatherController.stream.concatMap((item) => _getApi(item));
+  Observable<BlocStates<Weather>> weatherStateFlux;
 
   Sink<String> get changeCity => _weatherController.sink;
 
   Stream<BlocStates<Weather>> _getApi(String string) async* {
+
     yield BlocStates.loading();
 
     try {

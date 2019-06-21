@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_weather_app/blocs/weather_interceptor.dart';
@@ -6,14 +8,34 @@ import 'package:rxdart/rxdart.dart';
 
 class ThemeBloc extends BlocBase {
   WeatherInterceptor _interceptor;
+  List<StreamSubscription> _subscriptions;
 
-  ThemeBloc(this._interceptor);
+  ThemeBloc(this._interceptor) {
+    _subscriptions = <StreamSubscription>[
+      _interceptor.weatherFlux.listen(_gradientController.add),
+    ];
 
-  Observable<List<Color>> get gradientColorStream => _interceptor.weatherFlux.map((item) => _getGradient(item.condition)); 
+    gradientColorStream =
+        _gradientController.map((item) => _getGradient(item.condition));
 
-  Observable<Color> get appBarColor => _interceptor.weatherFlux.map((item) => _getColor(item.condition));
+    appBarColor = _gradientController.map((item) => _getColor(item.condition));
+  }
 
-   _getGradient(WeatherCondition condition) {
+  var _gradientController = BehaviorSubject<Weather>(sync:true);
+
+  Observable<List<Color>> gradientColorStream;
+
+  Observable<Color> appBarColor;
+
+@override
+  dispose(){
+    super.dispose();
+    _gradientController.close();
+    _subscriptions.forEach((e) => e.cancel());
+  }
+
+
+  _getGradient(WeatherCondition condition) {
     switch (condition) {
       case WeatherCondition.clear:
       case WeatherCondition.lightCloud:
@@ -65,7 +87,7 @@ class ThemeBloc extends BlocBase {
     ];
   }
 
-   _getColor(WeatherCondition condition) {
+  _getColor(WeatherCondition condition) {
     switch (condition) {
       case WeatherCondition.clear:
       case WeatherCondition.lightCloud:
