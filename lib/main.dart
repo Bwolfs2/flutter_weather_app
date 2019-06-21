@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
        blocs: [
-         Bloc((i)=>WeatherBloc(i.getDependency<WeatherInterceptor>())),
+         Bloc((i)=>WeatherBloc(i.getDependency<WeatherInterceptor>(),i.getDependency<WeatherRepository>())),
          Bloc((i)=>ThemeBloc(i.getDependency<WeatherInterceptor>())),
        ],
        dependencies: [
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
          Dependency((i) => WeatherApiClient(i.getDependency<Dio>())),
          Dependency((i) => WeatherRepository(i.getDependency<WeatherApiClient>())),
          //Interceptor
-         Dependency((i)=>WeatherInterceptor(i.getDependency<WeatherRepository>()), singleton: true),
+         Dependency((i)=>WeatherInterceptor(), singleton: true),
        ],
       child: MaterialApp(
         title: 'Flutter Demo',

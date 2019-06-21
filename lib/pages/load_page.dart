@@ -13,7 +13,7 @@ class LoadPage extends StatelessWidget {
     return StreamBuilder<BlocStates<Weather>>(
       stream: bloc.weatherStateFlux,
       builder: (_, snap) {
-        if (snap.data == null || snap.data.isLoaded()) {
+        if (!snap.hasData || snap.data.isLoaded()) {
           return Container();
         }
 

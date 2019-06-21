@@ -19,21 +19,31 @@ class ThemeBloc extends BlocBase {
         _gradientController.map((item) => _getGradient(item.condition));
 
     appBarColor = _gradientController.map((item) => _getColor(item.condition));
+
+    obs = Observable.zip2<List<Color>, Color, List>(
+        gradientColorStream, appBarColor, (a, b) {
+      return [a, b];
+    }).asBroadcastStream();
+
+    obs.listen((e) {
+      print(e[0]);
+    });
   }
 
-  var _gradientController = BehaviorSubject<Weather>(sync:true);
+  Observable obs;
+
+  var _gradientController = BehaviorSubject<Weather>(sync: true);
 
   Observable<List<Color>> gradientColorStream;
 
   Observable<Color> appBarColor;
 
-@override
-  dispose(){
+  @override
+  dispose() {
     super.dispose();
     _gradientController.close();
     _subscriptions.forEach((e) => e.cancel());
   }
-
 
   _getGradient(WeatherCondition condition) {
     switch (condition) {

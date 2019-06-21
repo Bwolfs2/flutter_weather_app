@@ -7,40 +7,22 @@ import 'BlocStates.dart';
 
 class WeatherInterceptor extends BlocBase
 {
-  WeatherRepository _api;
-  WeatherInterceptor(this._api){
-    weatherStateFlux = _weatherController.stream.switchMap(_getApi);
-    weatherFlux = weatherStateFlux.where((mp) => mp.isSuccess()).map((mp) => mp.obj);  
-  }
+ 
 
-  final _weatherController = new BehaviorSubject<String>.seeded("Rio de Janeiro",sync:true);
+  final _weatherController =  new BehaviorSubject<Weather>(sync: true);
 
-  Observable<Weather>  weatherFlux;
+  final _statesController = BehaviorSubject<BlocStates<Weather>>(sync: true);
 
-  Observable<BlocStates<Weather>> weatherStateFlux;
+  Observable<Weather> get weatherFlux => _weatherController.stream;
+  Sink<Weather> get weatherSink => _weatherController.sink;
 
-  Sink<String> get changeCity => _weatherController.sink;
+  Observable<BlocStates<Weather>> get weatherStateFlux => _statesController.stream;
+  Sink<BlocStates<Weather>> get weatherStateSink => _statesController.sink;
 
-  Stream<BlocStates<Weather>> _getApi(String string) async* {
-
-    yield BlocStates.loading();
-
-    try {
-      var data = await _api.getWeather(string);
-
-      yield BlocStates.success(data);
-
-      await Future.delayed(Duration(milliseconds: 500));
-
-      yield BlocStates.loaded();
-    } catch (e) {
-      yield BlocStates.error(e.toString());
-    }
-  }
-
-    @override
-  void dispose() {
-    _weatherController.close();
+  @override
+  void dispose() {    
     super.dispose();
+    _weatherController.close();
+    _statesController.close();
   }
 }

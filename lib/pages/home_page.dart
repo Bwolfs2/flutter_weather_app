@@ -32,16 +32,21 @@ class _HomePageState extends State<HomePage> {
                 return Center(child: CircularProgressIndicator());
               }
               var stateWeather = snapshot.data;
-              return StreamBuilder<List<Color>>(
-                stream: blocTheme.gradientColorStream,
+              return StreamBuilder(
+                stream: blocTheme.obs,
                 initialData: <Color>[Colors.white, Colors.white, Colors.white],
                 builder: (context, snapshotTheme) {
+
+                  if(!snapshotTheme.hasData){
+                    return Container();
+                  }
+
                   return Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: snapshotTheme.data,
+                        colors: snapshotTheme.data[0] as List<Color>,
                       ),
                     ),
                     child: Center(
