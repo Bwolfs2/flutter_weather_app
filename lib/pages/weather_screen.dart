@@ -2,6 +2,7 @@ import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_weather_app/blocs/theme_bloc.dart';
 import 'package:flutter_weather_app/blocs/weather_bloc.dart';
+import 'package:flutter_weather_app/blocs/weather_bloc_state.dart';
 import 'package:flutter_weather_app/models/image_condition_helper.dart';
 import 'package:flutter_weather_app/models/weather.dart';
 
