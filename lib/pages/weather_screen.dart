@@ -14,7 +14,7 @@ class WeatherScreen extends StatefulWidget {
 class _WeatherScreenState extends State<WeatherScreen> {
   var bloc = BlocProvider.getBloc<WeatherBloc>();
   var blocTheme = BlocProvider.getBloc<ThemeBloc>();
-
+var count = 0;
   final List<PopupMenuItem<int>> dropList = new List<PopupMenuItem<int>>();
 
   PopupMenuItem<int> popupMenuItem(String text, int value) {

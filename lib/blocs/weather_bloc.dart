@@ -6,18 +6,21 @@ import 'package:rxdart/rxdart.dart';
 
 class WeatherBloc extends BlocBase {
   WeatherRepository _api;
-  WeatherBloc(this._api);
+  WeatherBloc(this._api)
+  {
+    weatherFlux = weatherStateFlux.where((mp) => mp.isSuccess()).map((mp) => mp.obj);
+    weatherStateFlux = _weatherController.stream.concatMap((item) => _getApi(item));
+  }
 
   final _weatherController = new BehaviorSubject<String>.seeded("Rio de Janeiro");
   Sink<String> get weatherSink =>_weatherController.sink;
 
-  Observable<Weather> get weatherFlux => weatherStateFlux.where((mp) => mp.isSuccess()).map((mp) => mp.obj);
+  Observable<Weather> weatherFlux;
 
-  Observable<BlocState<Weather>> get weatherStateFlux =>
-      _weatherController.stream.concatMap((item) => _getApi(item));
-
+  Observable<BlocState<Weather>> weatherStateFlux;
 
   Stream<BlocState<Weather>> _getApi(String string) async* {
+
     yield BlocState.loading();
 
     try {
