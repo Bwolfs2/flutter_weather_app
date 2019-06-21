@@ -15,9 +15,7 @@ class ThemeBloc extends BlocBase {
       _interceptor.weatherFlux.listen(_gradientController.add),
     ];
 
-    gradientColorStream =
-        _gradientController.map((item) => _getGradient(item.condition));
-
+    gradientColorStream = _gradientController.map((item) => _getGradient(item.condition));
     appBarColor = _gradientController.map((item) => _getColor(item.condition));
 
     obs = Observable.zip2<List<Color>, Color, List>(

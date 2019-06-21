@@ -6,9 +6,7 @@ import 'package:rxdart/rxdart.dart';
 import 'BlocStates.dart';
 
 class WeatherInterceptor extends BlocBase
-{
- 
-
+{ 
   final _weatherController =  new BehaviorSubject<Weather>(sync: true);
 
   final _statesController = BehaviorSubject<BlocStates<Weather>>(sync: true);
