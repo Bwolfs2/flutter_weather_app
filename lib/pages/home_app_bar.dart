@@ -27,14 +27,14 @@ class HomeAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: StreamBuilder(
-        stream: blocTheme.obs,
+      child: StreamBuilder<Color>(
+        stream: blocTheme.appBarColor,
         builder: (context, AsyncSnapshot snapshot) {
           if(!snapshot.hasData){
             return AppBar();
           }
           return AppBar(
-            backgroundColor: snapshot.data[1] as Color,
+            backgroundColor: snapshot.data,
             title: Center(
               child: Text("Flutter Weather"),
             ),

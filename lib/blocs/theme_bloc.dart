@@ -8,27 +8,27 @@ import 'package:rxdart/rxdart.dart';
 
 class ThemeBloc extends BlocBase {
   WeatherInterceptor _interceptor;
-  List<StreamSubscription> _subscriptions;
+
 
   ThemeBloc(this._interceptor) {
-    _subscriptions = <StreamSubscription>[
-      _interceptor.weatherFlux.listen(_gradientController.add),
-    ];
+   
+      _interceptor.weatherFlux.pipe(_gradientController);
+    
 
     gradientColorStream = _gradientController.map((item) => _getGradient(item.condition));
     appBarColor = _gradientController.map((item) => _getColor(item.condition));
 
-    obs = Observable.zip2<List<Color>, Color, List>(
-        gradientColorStream, appBarColor, (a, b) {
-      return [a, b];
-    }).asBroadcastStream();
+    // obs = Observable.zip2<List<Color>, Color, List>(
+    //     gradientColorStream, appBarColor, (a, b) {
+    //   return [a, b];
+    // }).asBroadcastStream();
 
-    obs.listen((e) {
-      print(e[0]);
-    });
+    // obs.listen((e) {
+    //   print(e[0]);
+    // });
   }
 
-  Observable obs;
+ // Observable obs;
 
   var _gradientController = BehaviorSubject<Weather>(sync: true);
 
@@ -39,8 +39,7 @@ class ThemeBloc extends BlocBase {
   @override
   dispose() {
     super.dispose();
-    _gradientController.close();
-    _subscriptions.forEach((e) => e.cancel());
+    _gradientController.close();   
   }
 
   _getGradient(WeatherCondition condition) {
